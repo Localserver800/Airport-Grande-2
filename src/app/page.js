@@ -88,7 +88,7 @@ export default function Home() {
             <div className="hidden md:flex items-center gap-x-7 text-sm font-medium">
               <Link href="/" className="text-amber-600 font-semibold transition-colors">Home</Link>
               <Link href="/rooms" className="text-gray-900 hover:text-amber-600 transition-colors">Rooms</Link>
-              <Link href="/photos" className="text-gray-900 hover:text-amber-600 transition-colors">Gallery</Link>
+              <Link href="/gallery" className="text-gray-900 hover:text-amber-600 transition-colors">Gallery</Link>
               <Link href="/contact" className="text-gray-900 hover:text-amber-600 transition-colors">Contact</Link>
               <Link href="/login" className="text-gray-900 hover:text-amber-600 transition-colors">Sign In</Link>
               <Link href="/booking" className="bg-gradient-to-br from-amber-600 to-amber-800 text-white px-7 py-3.5 rounded-full font-semibold text-sm tracking-wide shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all ml-2">
@@ -114,7 +114,7 @@ export default function Home() {
             <div className="px-6 pt-5 pb-8 flex flex-col gap-1 text-base font-medium">
               <Link href="/" className="py-3.5 border-b border-gray-100 text-amber-600">Home</Link>
               <Link href="/rooms" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Rooms</Link>
-              <Link href="/photos" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Gallery</Link>
+              <Link href="/gallery" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Gallery</Link>
               <Link href="/login" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Sign In</Link>
               <Link href="/booking" className="mt-5 block w-full text-center bg-gradient-to-br from-amber-600 to-amber-800 text-white py-4 rounded-full font-semibold text-base tracking-wide shadow-lg">
                 CHECK AVAILABILITY NOW
