@@ -31,7 +31,9 @@ export async function POST(request) {
 
     // 2. Send Confirmation Email via Nodemailer
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true, // Use SSL
       auth: {
         user: process.env.HOTEL_EMAIL,
         pass: process.env.HOTEL_PASSWORD,
@@ -60,8 +62,14 @@ export async function POST(request) {
       `
     };
 
-    // We don't await the email to avoid slowing down the user's booking screen
-    transporter.sendMail(mailOptions).catch(err => console.error("Email failed:", err));
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log("Email sent successfully to:", email);
+    } catch (emailErr) {
+      console.error("Nodemailer Error:", emailErr);
+      // We don't crash the whole process if only the email fails, 
+      // but we log it so you can see it in Vercel Logs.
+    }
 
     // 3. Sync to Google Calendar (Silently)
     try {
