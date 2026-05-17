@@ -4,72 +4,18 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Menu, X, ArrowRight, Zap, ChevronDown, Wifi, Car, Shield, Utensils } from "lucide-react";
-import { supabase } from "../lib/supabase"; // Connects to your real database!
 
 export default function Home() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showFloatingCta, setShowFloatingCta] = useState(false);
   
-  // Real-time Availability States
-  const [arrivalDate, setArrivalDate] = useState("");
-  const [departureDate, setDepartureDate] = useState("");
-  const [guests, setGuests] = useState("1 Guest");
-
-  const [availableApts, setAvailableApts] = useState(8); // Total Apartments
-  const [availableRooms, setAvailableRooms] = useState(6); // Total Rooms
-  const [isChecking, setIsChecking] = useState(false);
-
   // Scroll Logic for Floating Button
   useEffect(() => {
     const handleScroll = () => setShowFloatingCta(window.scrollY > 600);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // The Real-Time Database Checker
-  useEffect(() => {
-    const checkRealTimeAvailability = async () => {
-      // Only check if both dates are selected
-      if (!arrivalDate || !departureDate) return;
-      
-      setIsChecking(true);
-      try {
-        // Find bookings that overlap with the selected dates
-        const { data, error } = await supabase
-          .from('bookings')
-          .select('room_name')
-          .not('status', 'eq', 'cancelled')
-          .lt('check_in', departureDate) 
-          .gt('check_out', arrivalDate); 
-
-        if (error) throw error;
-
-        // Count how many of each type are currently booked
-        let bookedApts = 0;
-        let bookedRooms = 0;
-
-        data.forEach(booking => {
-          if (booking.room_name?.toLowerCase().includes('apartment')) {
-            bookedApts++;
-          } else {
-            bookedRooms++;
-          }
-        });
-
-        // Subtract booked rooms from the total inventory
-        setAvailableApts(Math.max(0, 8 - bookedApts));
-        setAvailableRooms(Math.max(0, 6 - bookedRooms));
-
-      } catch (error) {
-        console.error("Error checking availability:", error);
-      } finally {
-        setIsChecking(false);
-      }
-    };
-
-    checkRealTimeAvailability();
-  }, [arrivalDate, departureDate]); // Re-runs instantly anytime a date changes!
 
   return (
     <div className="bg-gray-50 min-h-screen font-sans">
@@ -165,89 +111,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* QUICK AVAILABILITY CHECKER */}
-      <section className="bg-white py-12 border-b">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="bg-gray-50 rounded-3xl p-8 md:p-10 shadow-inner border border-gray-100">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 font-serif mb-2">Check Real-Time Availability</h2>
-              
-              {/* Dynamic Status Text */}
-              <p className="text-gray-500 font-medium h-6">
-                {isChecking ? (
-                  <span className="text-amber-600 animate-pulse">Checking live inventory...</span>
-                ) : arrivalDate && departureDate ? (
-                  <span className="text-green-600 font-semibold">
-                    Available right now: {availableApts} Apartments • {availableRooms} Rooms
-                  </span>
-                ) : (
-                  "Instant quotes for short or long stays"
-                )}
-              </p>
-            </div>
-
-            <form 
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!arrivalDate || !departureDate) return alert("Please select your dates.");
-                if (arrivalDate >= departureDate) return alert("Departure must be after Arrival.");
-                if (availableApts === 0 && availableRooms === 0) return alert("Sorry, we are completely booked for these dates!");
-                
-                // Route them to the booking page with their exact dates pre-filled!
-                router.push(`/booking?checkin=${arrivalDate}&checkout=${departureDate}&guests=${guests.split(' ')[0]}`);
-              }} 
-              className="flex flex-col md:flex-row gap-4 items-end"
-            >
-              <div className="w-full md:w-1/4 text-left">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Arrival</label>
-                <input 
-                  type="date" 
-                  required
-                  value={arrivalDate}
-                  onChange={(e) => setArrivalDate(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]} 
-                  className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-amber-500 text-base !text-gray-900 bg-white font-medium" 
-                />
-              </div>
-              
-              <div className="w-full md:w-1/4 text-left">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Departure</label>
-                <input 
-                  type="date" 
-                  required
-                  value={departureDate}
-                  onChange={(e) => setDepartureDate(e.target.value)}
-                  min={arrivalDate || new Date().toISOString().split('T')[0]} 
-                  className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-amber-500 text-base !text-gray-900 bg-white font-medium" 
-                />
-              </div>
-
-              <div className="w-full md:w-1/4 text-left">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Guests</label>
-                <select 
-                  value={guests}
-                  onChange={(e) => setGuests(e.target.value)}
-                  className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-amber-500 text-base !text-gray-900 bg-white font-medium"
-                >
-                  <option value="1 Guest">1 Guest</option>
-                  <option value="2 Guests">2 Guests</option>
-                  <option value="3 Guests">3 Guests</option>
-                  <option value="4 Guests">4 Guests</option>
-                </select>
-              </div>
-              
-              <button 
-                type="submit" 
-                disabled={isChecking || (!arrivalDate && !departureDate ? false : availableApts === 0 && availableRooms === 0)}
-                className="w-full md:w-1/4 bg-gradient-to-br from-amber-600 to-amber-800 text-white font-bold py-4 rounded-2xl text-sm tracking-wide transition-all hover:scale-[1.02] shadow-lg disabled:opacity-50 disabled:hover:scale-100 h-[60px]"
-              >
-                {availableApts === 0 && availableRooms === 0 && arrivalDate && departureDate ? "SOLD OUT" : "SEE AVAILABLE UNITS"}
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
-
       {/* AMENITIES */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -270,8 +133,8 @@ export default function Home() {
                 <div className="w-20 h-20 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <amenity.icon className="w-10 h-10 text-amber-600" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3 font-serif">{amenity.title}</h3>
-                <p className="text-gray-500">{amenity.desc}</p>
+                <h3 className="text-xl font-bold !text-gray-900 font-serif mb-2">{amenity.title}</h3>
+                <p className="text-gray-800 font-bold">{amenity.desc}</p>
               </div>
             ))}
           </div>

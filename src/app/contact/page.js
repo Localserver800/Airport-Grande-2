@@ -74,7 +74,7 @@ export default function ContactPage() {
               <Link href="/" className="text-gray-900 hover:text-amber-600 transition-colors">Home</Link>
               <Link href="/rooms" className="text-gray-900 hover:text-amber-600 transition-colors">Rooms</Link>
               <Link href="/amenities" className="text-gray-900 hover:text-amber-600 transition-colors">Amenities</Link>
-              <Link href="/photos" className="text-gray-900 hover:text-amber-600 transition-colors">Gallery</Link>
+              <Link href="/gallery" className="text-gray-900 hover:text-amber-600 transition-colors">Gallery</Link>
               <Link href="/contact" className="text-amber-600 font-semibold transition-colors">Contact</Link>
               <Link href="/login" className="text-gray-900 hover:text-amber-600 transition-colors">Sign In</Link>
 
@@ -102,7 +102,7 @@ export default function ContactPage() {
               <Link href="/" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Home</Link>
               <Link href="/rooms" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Rooms</Link>
               <Link href="/amenities" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Amenities</Link>
-              <Link href="/photos" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Gallery</Link>
+              <Link href="/gallery" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Gallery</Link>
               <Link href="/contact" className="py-3.5 border-b border-gray-100 text-amber-600">Contact</Link>
               <Link href="/login" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Sign In</Link>
               <Link href="/booking" className="mt-5 block w-full text-center bg-gradient-to-br from-amber-600 to-amber-800 text-white py-4 rounded-full font-semibold text-base tracking-wide shadow-lg">
@@ -306,14 +306,14 @@ export default function ContactPage() {
               <ul className="space-y-3 text-sm text-gray-400">
                 <li><Link href="/rooms" className="hover:text-white transition-colors">Rooms & Floor Plans</Link></li>
                 <li><Link href="/amenities" className="hover:text-white transition-colors">Amenities</Link></li>
-                <li><Link href="/photos" className="hover:text-white transition-colors">Gallery</Link></li>
+                <li><Link href="/gallery" className="hover:text-white transition-colors">Gallery</Link></li>
                 <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-6 text-base">Residents & Applicants</h4>
               <ul className="space-y-3 text-sm text-gray-400">
-                <li><Link href="/photos" className="hover:text-white transition-colors">Photo Gallery</Link></li>
+                <li><Link href="/gallery" className="hover:text-white transition-colors">Photo Gallery</Link></li>
                 <li><Link href="/contact" className="hover:text-white transition-colors">Map & Location</Link></li>
                 <li><Link href="/login" className="hover:text-white transition-colors">Guest Portal</Link></li>
                 <li><Link href="/contact" className="hover:text-white transition-colors">Long-Stay Enquiry</Link></li>
