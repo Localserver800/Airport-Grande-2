@@ -73,25 +73,33 @@ export async function POST(request) {
 
     // 3. Sync to Google Calendar (Silently)
     try {
-      const auth = new google.auth.GoogleAuth({
-        keyFile: './google-credentials.json', // Ensure this file is moved to your Next.js root folder
-        scopes: ['https://www.googleapis.com/auth/calendar.events'],
-      });
-      const calendar = google.calendar({ version: 'v3', auth });
+      if (process.env.GOOGLE_CREDENTIALS) {
+        const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+        const auth = new google.auth.GoogleAuth({
+          credentials: {
+            client_email: credentials.client_email,
+            private_key: credentials.private_key.replace(/\\n/g, '\n'),
+          },
+          scopes: ['https://www.googleapis.com/auth/calendar.events'],
+        });
+        const calendar = google.calendar({ version: 'v3', auth });
 
-      await calendar.events.insert({
-        calendarId: process.env.HOTEL_EMAIL,
-        requestBody: {
-          summary: `Booking: ${roomLabel} - ${name}`,
-          location: 'Airport Grande Luxury Lodge',
-          description: `Ref: ${paymentRef}\nPhone: ${phone}\nEmail: ${email}\nRequests: ${specialRequests || 'None'}`,
-          start: { dateTime: new Date(`${checkIn}T14:00:00+00:00`).toISOString(), timeZone: 'Africa/Accra' },
-          end: { dateTime: new Date(`${checkOut}T11:00:00+00:00`).toISOString(), timeZone: 'Africa/Accra' },
-          colorId: '5',
-        },
-      });
+        await calendar.events.insert({
+          calendarId: process.env.HOTEL_EMAIL,
+          requestBody: {
+            summary: `Booking: ${roomLabel} - ${name}`,
+            location: 'Airport Grande Luxury Lodge',
+            description: `Ref: ${paymentRef}\nPhone: ${phone}\nEmail: ${email}\nRequests: ${specialRequests || 'None'}`,
+            start: { dateTime: new Date(`${checkIn}T14:00:00+00:00`).toISOString(), timeZone: 'Africa/Accra' },
+            end: { dateTime: new Date(`${checkOut}T11:00:00+00:00`).toISOString(), timeZone: 'Africa/Accra' },
+            colorId: '5',
+          },
+        });
+      } else {
+        console.warn('Google Calendar Sync skipped: GOOGLE_CREDENTIALS not found.');
+      }
     } catch (calError) {
-      console.error('Google Calendar Sync Failed. Check your JSON credentials.');
+      console.error('Google Calendar Sync Failed:', calError.message);
     }
 
     return NextResponse.json({ success: true, message: `Booking reserved! We just emailed your ticket to ${email}.` });
