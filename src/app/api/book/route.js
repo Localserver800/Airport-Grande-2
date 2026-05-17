@@ -4,6 +4,8 @@ import { google } from 'googleapis';
 import { supabase } from '../../../lib/supabase';
 import crypto from 'crypto';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const body = await request.json();
