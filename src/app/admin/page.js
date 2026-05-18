@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "../../lib/supabase";
 import { 
@@ -9,6 +10,8 @@ import {
 } from "lucide-react";
 
 export default function AdminDashboard() {
+  const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -17,26 +20,59 @@ export default function AdminDashboard() {
   const [bookings, setBookings] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    available: 14,
+    booked: 0,
+    occupied: 0,
+    pending: 0
+  });
 
   // New Room Form State
   const [newRoom, setNewRoom] = useState({ name: "", type: "", status: "available" });
 
+  // --- THE SECURITY CHECK ---
   useEffect(() => {
-    fetchData();
+    const checkAdminAccess = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        router.push("/admin/login");
+        return;
+      }
 
-    // SUPABASE REALTIME MAGIC: Listen for new bookings instantly!
-    const channel = supabase.channel('custom-all-channel')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bookings' }, (payload) => {
-        const newBooking = payload.new;
-        setNotifications(prev => [newBooking, ...prev]);
-        fetchData(); // Refresh data silently
-      })
-      .subscribe();
+      // Your actual admin email
+      const adminEmail = "airportgrande@gmail.com"; 
 
-    return () => {
-      supabase.removeChannel(channel);
+      if (session.user.email !== adminEmail) {
+        alert("Unauthorized access. Admin privileges required.");
+        router.push("/");
+        return;
+      }
+
+      setIsAuthorized(true);
     };
-  }, []);
+
+    checkAdminAccess();
+  }, [router]);
+
+  useEffect(() => {
+    if (isAuthorized) {
+      fetchData();
+
+      // SUPABASE REALTIME MAGIC: Listen for new bookings instantly!
+      const channel = supabase.channel('custom-all-channel')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bookings' }, (payload) => {
+          const newBooking = payload.new;
+          setNotifications(prev => [newBooking, ...prev]);
+          fetchData(); // Refresh data silently
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [isAuthorized]);
 
   const fetchData = async () => {
     try {
@@ -44,8 +80,24 @@ export default function AdminDashboard() {
         supabase.from("rooms").select("*").order("name"),
         supabase.from("bookings").select("*").order("created_at", { ascending: false })
       ]);
-      setRooms(roomsRes.data || []);
-      setBookings(bookingsRes.data || []);
+      
+      const roomsData = roomsRes.data || [];
+      const bookingsData = bookingsRes.data || [];
+      
+      setRooms(roomsData);
+      setBookings(bookingsData);
+
+      // Calculate live numbers based on 14 total units
+      const totalBooked = bookingsData.length;
+      const totalRooms = 14;
+
+      setStats({
+        available: Math.max(0, totalRooms - totalBooked),
+        booked: totalBooked,
+        occupied: roomsData.filter(r => r.status === 'occupied').length,
+        pending: roomsData.filter(r => r.status === 'pending').length,
+      });
+
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -80,13 +132,15 @@ export default function AdminDashboard() {
     fetchData();
   };
 
-  // --- DERIVED STATS ---
-  const stats = {
-    available: rooms.filter(r => r.status === 'available').length,
-    booked: rooms.filter(r => r.status === 'booked').length,
-    occupied: rooms.filter(r => r.status === 'occupied').length,
-    pending: rooms.filter(r => r.status === 'pending').length,
-  };
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <p className="text-xl font-semibold text-amber-600 animate-pulse">Verifying Admin Credentials...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans flex flex-col md:flex-row">
