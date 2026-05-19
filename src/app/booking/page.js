@@ -166,9 +166,8 @@ function BookingContent() {
       // Step B: Trigger Paystack (Using the typed-in email!)
       if (typeof window !== 'undefined' && window.PaystackPop) {
         const handler = window.PaystackPop.setup({
-          key: 'pk_test_241a5877501d961c82643193a90d669714c25bb4', 
-          email: formData.email, 
-          amount: 50, 
+          key: 'pk_test_93844be6926940f7365ee5c5626f3984fe47214d', 
+          email: formData.email,          amount: 50, 
           currency: 'GHS',
           
           // Use a standard function here so Paystack's old validator accepts it
