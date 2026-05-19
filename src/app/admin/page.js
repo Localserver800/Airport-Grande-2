@@ -352,14 +352,32 @@ export default function AdminDashboard() {
                                 {b.check_in} <br/> <span className="text-xs text-gray-400">to</span> {b.check_out}
                               </td>
                               <td className="px-5 py-4">
-                                <select 
-                                  value={b.status} 
-                                  onChange={(e) => updateBookingStatus(b.id, e.target.value)}
-                                  className={`text-xs font-bold px-3 py-1.5 rounded-full outline-none border border-transparent cursor-pointer ${b.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}
-                                >
-                                  <option value="pending">Pending</option>
-                                  <option value="confirmed">Confirmed</option>
-                                </select>
+                                {b.status === 'confirmed' ? (
+                                  <button 
+                                    onClick={() => updateBookingStatus(b.id, 'checked_in')}
+                                    className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 text-xs font-bold transition-colors shadow-sm"
+                                  >
+                                    Check In
+                                  </button>
+                                ) : b.status === 'checked_in' ? (
+                                  <button 
+                                    onClick={() => updateBookingStatus(b.id, 'checked_out')}
+                                    className="bg-amber-600 text-white px-4 py-2 rounded-xl hover:bg-amber-700 text-xs font-bold transition-colors shadow-sm"
+                                  >
+                                    Check Out
+                                  </button>
+                                ) : b.status === 'pending' ? (
+                                  <button 
+                                    onClick={() => updateBookingStatus(b.id, 'confirmed')}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 text-xs font-bold transition-colors shadow-sm"
+                                  >
+                                    Approve
+                                  </button>
+                                ) : (
+                                  <span className="text-gray-400 text-xs font-bold uppercase tracking-wider italic">
+                                    {b.status.replace('_', ' ')}
+                                  </span>
+                                )}
                               </td>
                               <td className="px-5 py-4 text-right">
                                 <button onClick={() => deleteBooking(b.id)} className="text-gray-400 hover:text-red-500 transition-colors p-2">
