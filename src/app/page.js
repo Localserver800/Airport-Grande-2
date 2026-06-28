@@ -10,6 +10,29 @@ export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showFloatingCta, setShowFloatingCta] = useState(false);
   
+  // Search State
+  const [arrival, setArrival] = useState("");
+  const [departure, setDeparture] = useState("");
+  const [guests, setGuests] = useState("1 Guest");
+
+  // The function that runs when they click the big button
+  const handleSearch = (e) => {
+    if (e) e.preventDefault();
+    if (!arrival || !departure) {
+      alert("Please select both your arrival and departure dates!");
+      return;
+    }
+    
+    // Push the user to a new page, bringing the dates along in the URL!
+    router.push(`/search?arrival=${arrival}&departure=${departure}&guests=${guests}`);
+  };
+
+  const scrollToForm = (e) => {
+    if (e) e.preventDefault();
+    document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' });
+    setIsMenuOpen(false); // Close mobile menu if open
+  };
+
   // Scroll Logic for Floating Button
   useEffect(() => {
     const handleScroll = () => setShowFloatingCta(window.scrollY > 600);
@@ -37,16 +60,16 @@ export default function Home() {
               <Link href="/gallery" className="text-gray-900 hover:text-amber-600 transition-colors">Gallery</Link>
               <Link href="/contact" className="text-gray-900 hover:text-amber-600 transition-colors">Contact</Link>
               <Link href="/login" className="text-gray-900 hover:text-amber-600 transition-colors">Sign In</Link>
-              <Link href="/booking" className="bg-gradient-to-br from-amber-600 to-amber-800 text-white px-7 py-3.5 rounded-full font-semibold text-sm tracking-wide shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all ml-2">
+              <button 
+                onClick={scrollToForm}
+                className="bg-gradient-to-br from-amber-600 to-amber-800 text-white px-7 py-3.5 rounded-full font-semibold text-sm tracking-wide shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all ml-2"
+              >
                 CHECK AVAILABILITY
-              </Link>
+              </button>
             </div>
 
             {/* Mobile Nav Toggle */}
             <div className="md:hidden flex items-center gap-3">
-              <Link href="/booking" className="hidden md:block bg-gradient-to-br from-amber-600 to-amber-800 text-white px-4 py-2.5 rounded-full font-semibold text-xs tracking-wide shadow-md transition-all">
-                Check Availability
-              </Link>
               <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-800 hover:text-amber-600 p-1.5">
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -62,19 +85,25 @@ export default function Home() {
               <Link href="/rooms" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Rooms</Link>
               <Link href="/gallery" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Gallery</Link>
               <Link href="/login" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Sign In</Link>
-              <Link href="/booking" className="mt-5 block w-full text-center bg-gradient-to-br from-amber-600 to-amber-800 text-white py-4 rounded-full font-semibold text-base tracking-wide shadow-lg">
+              <button 
+                onClick={scrollToForm}
+                className="mt-5 block w-full text-center bg-gradient-to-br from-amber-600 to-amber-800 text-white py-4 rounded-full font-semibold text-base tracking-wide shadow-lg"
+              >
                 CHECK AVAILABILITY NOW
-              </Link>
+              </button>
             </div>
           </div>
         )}
       </header>
 
       {/* FLOATING CTA */}
-      <Link href="/booking" className={`${showFloatingCta ? 'flex' : 'hidden'} md:flex items-center gap-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white px-8 py-4 rounded-full font-semibold shadow-2xl transition-all fixed bottom-6 right-6 z-40 text-base hover:scale-105`}>
+      <button 
+        onClick={scrollToForm}
+        className={`${showFloatingCta ? 'flex' : 'hidden'} md:flex items-center gap-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white px-8 py-4 rounded-full font-semibold shadow-2xl transition-all fixed bottom-6 right-6 z-40 text-base hover:scale-105`}
+      >
         <span>Check Availability</span>
         <ArrowRight className="w-5 h-5" />
-      </Link>
+      </button>
 
       {/* HERO SECTION */}
       <section className="relative h-screen min-h-[640px] flex items-center pt-20">
@@ -99,15 +128,71 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/booking" className="bg-gradient-to-br from-amber-600 to-amber-800 flex-1 sm:flex-none text-center text-white text-base sm:text-lg font-semibold px-10 py-6 rounded-full shadow-xl hover:scale-[1.03] transition-all">
+              <button 
+                onClick={scrollToForm}
+                className="bg-gradient-to-br from-amber-600 to-amber-800 flex-1 sm:flex-none text-center text-white text-base sm:text-lg font-semibold px-10 py-6 rounded-full shadow-xl hover:scale-[1.03] transition-all"
+              >
                 CHECK AVAILABILITY
-              </Link>
+              </button>
             </div>
           </div>
         </div>
 
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white animate-bounce">
           <ChevronDown className="w-9 h-9" />
+        </div>
+      </section>
+
+      {/* QUICK AVAILABILITY CHECKER */}
+      <section id="booking-form" className="bg-white py-12 border-b">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="bg-gray-50 rounded-3xl p-8 md:p-10 shadow-inner">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 font-serif">Check Real-Time Availability</h2>
+              <p className="text-gray-600 mt-3 text-base">Instant quotes for short or long stays</p>
+            </div>
+            
+            <form className="grid md:grid-cols-4 gap-6" onSubmit={handleSearch}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Arrival</label>
+                <input 
+                  type="date" 
+                  value={arrival}
+                  onChange={(e) => setArrival(e.target.value)}
+                  className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-amber-500 text-base bg-white text-gray-900 font-medium" 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Departure</label>
+                <input 
+                  type="date" 
+                  value={departure}
+                  onChange={(e) => setDeparture(e.target.value)}
+                  className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-amber-500 text-base bg-white text-gray-900 font-medium" 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Guests</label>
+                <select 
+                  value={guests}
+                  onChange={(e) => setGuests(e.target.value)}
+                  className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-amber-500 text-base bg-white text-gray-900 font-medium"
+                >
+                  <option>1 Guest</option>
+                  <option>2 Guests</option>
+                  <option>3 Guests</option>
+                  <option>4 Guests</option>
+                  <option>5+ Guests</option>
+                </select>
+              </div>
+              <div className="flex items-end">
+                <button type="submit"
+                        className="w-full bg-gradient-to-br from-amber-600 to-amber-800 text-white font-semibold py-4 rounded-full text-base sm:text-lg hover:shadow-xl transition-all">
+                  SEE AVAILABLE UNITS
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </section>
 

@@ -49,9 +49,6 @@ export default function GalleryPage() {
           </div>
 
           <div className="md:hidden flex items-center gap-3">
-            <Link href="/booking" className="hidden md:block bg-gradient-to-br from-amber-600 to-amber-800 text-white px-4 py-2.5 rounded-2xl font-semibold text-xs shadow-md">
-              Check Availability
-            </Link>
             <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-800 p-1.5">
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>

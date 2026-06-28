@@ -12,15 +12,25 @@ import {
 export default function RoomsPage() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [arrivalDate, setArrivalDate] = useState("");
+  
+  // Search State
+  const [arrival, setArrival] = useState("");
+  const [departure, setDeparture] = useState("");
+  const [guests, setGuests] = useState("1 Guest");
 
-  const handleRoomFormSubmit = (e) => {
-    e.preventDefault();
-    if (arrivalDate) {
-      router.push(`/booking?checkin=${arrivalDate}`);
-    } else {
-      router.push('/booking');
+  const handleSearch = (e) => {
+    if (e) e.preventDefault();
+    if (!arrival || !departure) {
+      alert("Please select both your arrival and departure dates!");
+      return;
     }
+    router.push(`/search?arrival=${arrival}&departure=${departure}&guests=${guests}`);
+  };
+
+  const scrollToForm = (e) => {
+    if (e) e.preventDefault();
+    document.getElementById('quick-availability')?.scrollIntoView({ behavior: 'smooth' });
+    setIsMenuOpen(false);
   };
 
   return (
@@ -43,16 +53,16 @@ export default function RoomsPage() {
               <Link href="/amenities" className="text-gray-900 hover:text-amber-600 transition-colors">Amenities</Link>
               <Link href="/gallery" className="text-gray-900 hover:text-amber-600 transition-colors">Gallery</Link>
               <Link href="/contact" className="text-gray-900 hover:text-amber-600 transition-colors">Contact</Link>
-              <Link href="/booking" className="bg-gradient-to-br from-amber-600 to-amber-800 text-white px-7 py-3.5 rounded-full font-semibold text-sm tracking-wide shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all ml-2">
+              <button 
+                onClick={scrollToForm}
+                className="bg-gradient-to-br from-amber-600 to-amber-800 text-white px-7 py-3.5 rounded-full font-semibold text-sm tracking-wide shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all ml-2"
+              >
                 CHECK AVAILABILITY
-              </Link>
+              </button>
             </div>
 
             {/* Mobile Nav Toggle */}
             <div className="md:hidden flex items-center gap-3">
-              <Link href="/booking" className="hidden md:block bg-gradient-to-br from-amber-600 to-amber-800 text-white px-4 py-2.5 rounded-full font-semibold text-xs tracking-wide shadow-md transition-all">
-                Check Availability
-              </Link>
               <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-800 hover:text-amber-600 p-1.5">
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -70,9 +80,12 @@ export default function RoomsPage() {
               <Link href="/gallery" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Gallery</Link>
               <Link href="/contact" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Contact</Link>
               <Link href="/login" className="py-3.5 border-b border-gray-100 text-gray-800 hover:text-amber-600">Sign In</Link>
-              <Link href="/booking" className="mt-5 block w-full text-center bg-gradient-to-br from-amber-600 to-amber-800 text-white py-4 rounded-full font-semibold text-base tracking-wide shadow-lg">
+              <button 
+                onClick={scrollToForm}
+                className="mt-5 block w-full text-center bg-gradient-to-br from-amber-600 to-amber-800 text-white py-4 rounded-full font-semibold text-base tracking-wide shadow-lg"
+              >
                 CHECK AVAILABILITY NOW
-              </Link>
+              </button>
             </div>
           </div>
         )}
@@ -134,18 +147,32 @@ export default function RoomsPage() {
               <p className="text-gray-600 mt-3 text-base">Instant quotes for short or long stays</p>
             </div>
             
-            <form className="grid md:grid-cols-4 gap-6" onSubmit={handleRoomFormSubmit}>
+            <form className="grid md:grid-cols-4 gap-6" onSubmit={handleSearch}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Arrival</label>
-                <input type="date" value={arrivalDate} onChange={(e) => setArrivalDate(e.target.value)} className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-amber-500 text-base bg-white text-gray-900 font-medium" />
+                <input 
+                  type="date" 
+                  value={arrival} 
+                  onChange={(e) => setArrival(e.target.value)} 
+                  className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-amber-500 text-base bg-white text-gray-900 font-medium" 
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Departure</label>
-                <input type="date" className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-amber-500 text-base bg-white text-gray-900 font-medium" />
+                <input 
+                  type="date" 
+                  value={departure}
+                  onChange={(e) => setDeparture(e.target.value)}
+                  className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-amber-500 text-base bg-white text-gray-900 font-medium" 
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Guests</label>
-                <select className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-amber-500 text-base bg-white text-gray-900 font-medium">
+                <select 
+                  value={guests}
+                  onChange={(e) => setGuests(e.target.value)}
+                  className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:border-amber-500 text-base bg-white text-gray-900 font-medium"
+                >
                   <option>1 Guest</option>
                   <option>2 Guests</option>
                   <option>3 Guests</option>

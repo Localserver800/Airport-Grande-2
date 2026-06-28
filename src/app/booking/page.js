@@ -43,18 +43,23 @@ function BookingContent() {
     const fetchUserDataAndParams = async () => {
       let initialData = { ...formData };
 
-      // Pull ALL URL Params (from Homepage)
+      // Pull ALL URL Params (from Homepage or Search page)
       const urlCheckIn = searchParams.get("checkin");
       const urlCheckOut = searchParams.get("checkout");
       const urlGuests = searchParams.get("guests");
-      const urlType = searchParams.get("type"); // Keeping this just in case!
+      const urlType = searchParams.get("type");
+      const urlRoomId = searchParams.get("roomId");
+      const urlRoomLabel = searchParams.get("roomLabel");
 
       // Apply the data so it auto-fills the form!
       if (urlCheckIn) initialData.checkIn = urlCheckIn;
       if (urlCheckOut) initialData.checkOut = urlCheckOut;
       if (urlGuests) initialData.numGuests = urlGuests;
       
-      if (urlType === "Apartment") {
+      if (urlRoomId) {
+        initialData.roomId = urlRoomId;
+        initialData.roomLabel = urlRoomLabel || urlRoomId;
+      } else if (urlType === "Apartment") {
         initialData.roomId = "apt-1";
         initialData.roomLabel = "Apartment 1 – 2 Bedroom";
       } else if (urlType === "Room") {
@@ -166,8 +171,9 @@ function BookingContent() {
       // Step B: Trigger Paystack (Using the typed-in email!)
       if (typeof window !== 'undefined' && window.PaystackPop) {
         const handler = window.PaystackPop.setup({
-          key: 'pk_test_93844be6926940f7365ee5c5626f3984fe47214d', 
-          email: formData.email,          amount: 50, 
+          key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || 'pk_test_placeholder', 
+          email: formData.email,
+          amount: summary.total * 100, // Amount in kobo/pesewas
           currency: 'GHS',
           
           // Use a standard function here so Paystack's old validator accepts it

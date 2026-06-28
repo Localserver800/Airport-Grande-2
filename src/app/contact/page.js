@@ -85,9 +85,6 @@ export default function ContactPage() {
 
             {/* Mobile Nav Toggle */}
             <div className="md:hidden flex items-center gap-3">
-              <Link href="/booking" className="hidden md:block bg-gradient-to-br from-amber-600 to-amber-800 text-white px-4 py-2.5 rounded-full font-semibold text-xs tracking-wide shadow-md transition-all">
-                Check Availability
-              </Link>
               <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-800 hover:text-amber-600 p-1.5">
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>

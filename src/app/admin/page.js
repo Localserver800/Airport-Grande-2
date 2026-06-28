@@ -40,8 +40,8 @@ export default function AdminDashboard() {
         return;
       }
 
-      // Your actual admin email
-      const adminEmail = "airportgrande@gmail.com"; 
+      // Your actual admin email from environment variables
+      const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "airportgrande@gmail.com"; 
 
       if (session.user.email !== adminEmail) {
         alert("Unauthorized access. Admin privileges required.");

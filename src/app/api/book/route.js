@@ -11,19 +11,37 @@ export async function POST(request) {
     const body = await request.json();
     const { name, email, phone, checkIn, checkOut, roomId, roomLabel, specialRequests, paymentRef } = body;
 
+    // --- SECURITY: Input Validation ---
+    if (!name || !email || !phone || !checkIn || !checkOut || !roomId || !paymentRef) {
+      return NextResponse.json({ success: false, message: 'Missing required booking information.' }, { status: 400 });
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ success: false, message: 'Invalid email address.' }, { status: 400 });
+    }
+
+    // Date validation
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    if (isNaN(start.getTime()) || isNaN(end.getTime()) || start >= end) {
+      return NextResponse.json({ success: false, message: 'Invalid stay dates.' }, { status: 400 });
+    }
+
     // 1. Insert into Supabase
     const { data: insertData, error: insertError } = await supabase
       .from('bookings')
       .insert([{
-        guest_name: name,
-        guest_email: email,
-        guest_phone: phone,
+        guest_name: name.substring(0, 100), // Sanitization: Limit length
+        guest_email: email.toLowerCase(),
+        guest_phone: phone.substring(0, 20),
         check_in: checkIn,
         check_out: checkOut,
         room_id: roomId,
-        room_name: roomLabel,
-        special_requests: specialRequests,
-        status: 'confirmed',
+        room_name: roomLabel || 'Standard Room',
+        special_requests: (specialRequests || '').substring(0, 500),
+        status: 'confirmed', // Keep as 'confirmed' for now as it's called after payment
         payment_ref: paymentRef
       }]);
 
